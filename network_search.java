@@ -98,7 +98,7 @@ public class network_search {
         }
 
         if(ret == "")
-            ret = "无法查询到单词释义，请检查单词拼写\n";
+            ret = "无法查询到单词释义，请检查单词拼写";
 
         return "有道词典为您提供" + word + "的释义\n" + ret;
     }
@@ -178,7 +178,65 @@ public class network_search {
         }
 
         if(ret.replace("\n","") == "")
-            ret = "无法查询到单词释义，请检查单词拼写\n";
+            ret = "无法查询到单词释义，请检查单词拼写";
+        return ret;
+    }
+
+    static String baidu_search(String word)
+    {
+        String ret = "";
+        try
+        {
+            String search_url = "http://dict.baidu.com/s?wd=" + word;
+
+            URL url = new URL(search_url);
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
+            String data = null;
+
+            int num = 0;
+            while ((data = reader.readLine()) != null)
+            {
+                String result = blank_del(data);
+                int index = result.indexOf("<div class=\"en-content\">");
+
+                if(index >= 0)
+                    break;
+            }
+            data = reader.readLine();
+
+            String result = "";
+            if(data != null)
+            {
+                int index = data.indexOf("<p>");
+                if(index >= 0)
+                    data = data.substring(index + 11,data.length());
+
+                //System.out.println(data);
+
+                result = data.replace("<p>","\n");
+                result = result.replace("</strong>","");
+                result = result.replace("<strong>","");
+                result = result.replace("</p>","");
+                result = result.replace("<span>","");
+                result = result.replace("</span>","");
+                result = result.replace("</div>","");
+                result = result.replace("</a>","");
+
+                result = result.replaceAll("<a href=[a-zA-Z=?\"/= ]+>","");
+
+                ret = "百度词典为您提供" + word + "的释义\n" + result;
+            }
+            reader.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        if(ret == "")
+            ret = "无法查询到单词释义，请检查单词拼写";
+
         return ret;
     }
 
@@ -186,5 +244,6 @@ public class network_search {
     {
         System.out.println(youdao_search("Java"));
         System.out.println(bing_search("playground"));
+        System.out.println(baidu_search("Communication"));
     }
 }
