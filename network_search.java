@@ -10,13 +10,13 @@ import java.io.InputStreamReader;
 
 public class network_search {
 
-    public static boolean is_English(String str)
+    private boolean is_English(String str)
     {
         String str2 = str.replace(" ","");
         return str2.matches("[a-zA-Z',()-;]+");
     }
 
-    public static String blank_del(String str)
+    private String blank_del(String str)
     {
         for(int i=0;i<str.length();i++)
         {
@@ -29,7 +29,7 @@ public class network_search {
         return str;
     }
 
-    static String youdao_search(String word)
+    String youdao_search(String word)
     {
         String ret = "";
         try
@@ -103,7 +103,7 @@ public class network_search {
         return "有道词典为您提供" + word + "的释义\n" + ret;
     }
 
-    static String bing_search(String word)
+    String bing_search(String word)
     {
         String ret = "";
         try
@@ -182,7 +182,7 @@ public class network_search {
         return ret;
     }
 
-    static String baidu_search(String word)
+    String baidu_search(String word)
     {
         String ret = "";
         try
@@ -217,11 +217,11 @@ public class network_search {
                 result = data.replace("<p>","\n");
                 result = result.replace("</strong>","");
                 result = result.replace("<strong>","");
-                result = result.replace("</p>","");
+                result = result.replace("</p>"," ");
                 result = result.replace("<span>","");
                 result = result.replace("</span>","");
                 result = result.replace("</div>","");
-                result = result.replace("</a>","");
+                result = result.replace("</a>"," ");
 
                 result = result.replaceAll("<a href=[a-zA-Z=?\"/= ]+>","");
 
@@ -238,12 +238,5 @@ public class network_search {
             ret = "无法查询到单词释义，请检查单词拼写";
 
         return ret;
-    }
-
-    public static void main(String args[])
-    {
-        System.out.println(youdao_search("Java"));
-        System.out.println(bing_search("playground"));
-        System.out.println(baidu_search("Communication"));
     }
 }
