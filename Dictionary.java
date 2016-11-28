@@ -12,6 +12,8 @@ import java.io.*;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
 
+
+//仅用于测试，不再更新
 public class Dictionary extends JFrame{
     private JTextField input;            //输入框
     private JButton search, user, card, like1, like2, like3;              //搜索按钮, 分享按钮， 点赞按钮
@@ -28,8 +30,22 @@ public class Dictionary extends JFrame{
     public void search_word()
     {
         String word = input.getText();
-        System.out.println(word);
-        System.out.println(bd + "  " + yd + "  "+ bg);
+
+        network_search net = new network_search();
+
+        output1.setText("");
+        output2.setText("");
+        output3.setText("");
+
+        if(bd == true)
+            output1.setText(net.baidu_search(word));
+        if(yd == true)
+            output2.setText(net.youdao_search(word));
+        if(bg == true)
+            output3.setText(net.bing_search(word));
+
+        //System.out.println(word);
+        //System.out.println(bd + "  " + yd + "  "+ bg);
     }
 
     private void set_in()              //登陆窗口函数，待完善
