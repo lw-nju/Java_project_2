@@ -3,11 +3,34 @@
  */
 
 import java.util.*;
+import java.awt.*;
+import javax.swing.*;
 
-public class database_server {
+public class database_server extends JFrame{
+    private JTextArea text1, text2;
+
     public database_server()
     {
+        text1 = new JTextArea(1,50);
+        text1.setFont(new Font("宋体", Font.PLAIN, 20));
+        text1.setText("        服务器端图形界面：  以下是相关提示信息");
+        text1.setEditable(false);
 
+        text2 = new JTextArea(50,50);
+        text2.setFont(new Font("宋体", Font.PLAIN, 18));
+        text2.setBackground(Color.cyan);
+        text2.setEditable(false);
+
+        BorderLayout layout = new BorderLayout(5,5);
+        setLayout(layout);
+        getContentPane().add(BorderLayout.NORTH, text1);
+        getContentPane().add(BorderLayout.SOUTH, text2);
+
+        setSize(550,650);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(3);
+        setVisible(true);
     }
 
     public String get_like_num()           //从数据库获取点赞数目
