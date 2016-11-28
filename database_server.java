@@ -35,7 +35,7 @@ public class database_server {
         return true;
     }
 
-    public void get_message()
+    public void receive_message()
     {
 
     }
