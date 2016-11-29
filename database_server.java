@@ -8,6 +8,7 @@ import javax.swing.*;
 
 public class database_server extends JFrame{
     private JTextArea text1, text2;
+    private boolean sign;
 
     public database_server()
     {
