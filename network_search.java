@@ -31,6 +31,7 @@ public class network_search {
 
     String youdao_search(String word)
     {
+        word = word.replaceAll(" ","");
         String ret = "";
         try
         {
@@ -105,6 +106,7 @@ public class network_search {
 
     String bing_search(String word)
     {
+        word = word.replaceAll(" ","");
         String ret = "";
         try
         {
@@ -184,6 +186,7 @@ public class network_search {
 
     String baidu_search(String word)
     {
+        word = word.replaceAll(" ","");
         String ret = "";
         try
         {
