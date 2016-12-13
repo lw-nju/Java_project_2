@@ -199,6 +199,7 @@ public class MySQL_connect {
         return null;
     }
 
+    /*
     public static void main(String args[]) {
         MySQL_connect.insert_user("test" + "\t" + "012345678");
         MySQL_connect.insert_user("test2" + "\t" + "012345678");
@@ -216,5 +217,5 @@ public class MySQL_connect {
         System.out.println(MySQL_connect.get_likenum("game" + "\t" + "2"));
         System.out.println(MySQL_connect.get_signin("test"));
         System.out.println("\n" + MySQL_connect.get_online());
-    }
+    }*/
 }
