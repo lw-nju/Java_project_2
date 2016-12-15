@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 //连接MySQL数据库进行数据插入，更新与查询
 public class MySQL_connect {
-    private static Connection getConn() {              //连接数据库
+    private Connection getConn() {              //连接数据库
         String driver = "com.mysql.jdbc.Driver";
         String url = "jdbc:mysql://localhost:3306/Java_project";
         String username = "root";
@@ -28,7 +28,7 @@ public class MySQL_connect {
         return conn;
     }
 
-    private static int insert_user(String name_pass)
+    public int insert_user(String name_pass)
     {
         Connection conn = getConn();
 
@@ -53,7 +53,7 @@ public class MySQL_connect {
         return i;
     }
 
-    private static int insert_word(String word_index)
+    public int insert_word(String word_index)
     {
         Connection conn = getConn();
 
@@ -77,7 +77,7 @@ public class MySQL_connect {
         return i;
     }
 
-    private static int update_signin(String user, String current) {
+    public int update_signin(String user, String current) {
         Connection conn = getConn();
         int i = 0;
 
@@ -102,7 +102,7 @@ public class MySQL_connect {
         return i;
     }
 
-    private static int update_like(String word_index, int current_num) {
+    public int update_like(String word_index, int current_num) {
         Connection conn = getConn();
 
         String word = word_index.split("\t")[0];
@@ -123,7 +123,7 @@ public class MySQL_connect {
         return i;
     }
 
-    private static String get_password(String user_name) {
+    public String get_password(String user_name) {
         Connection conn = getConn();
         String sql = "select PASSWORD from USER where NAME='" + user_name + "'";
         PreparedStatement pstmt;
@@ -140,7 +140,7 @@ public class MySQL_connect {
         return null;
     }
 
-    private static String get_signin(String user_name) {
+    public String get_signin(String user_name) {
         Connection conn = getConn();
         String sql = "select SIGN_IN from USER where NAME='" + user_name + "'";
         System.out.println(sql);
@@ -156,7 +156,7 @@ public class MySQL_connect {
         return null;
     }
 
-    private static int get_likenum(String word_index) {
+    public int get_likenum(String word_index) {
         Connection conn = getConn();
         String word = word_index.split("\t")[0];
         String index = word_index.split("\t")[1];
@@ -177,7 +177,7 @@ public class MySQL_connect {
         return 0;
     }
 
-    private static String get_online() {
+    public String get_online() {
         Connection conn = getConn();
         String sql = "select NAME from USER where SIGN_IN='true'";
         PreparedStatement pstmt;

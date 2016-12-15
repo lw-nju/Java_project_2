@@ -4,68 +4,190 @@
 
 import java.util.*;
 import java.awt.*;
+import java.net.*;
+import java.io.*;
 import javax.swing.*;
+
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
+import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
 
 public class database_server extends JFrame{
     private JTextArea text1, text2;
     private boolean sign;
+    private ServerSocket server;
+    private int count = 0;
+    private MSG temp;
+    private PrintWriter writer;
+    private ObjectInputStream input;
+    private JScrollPane scroll;
 
-    public database_server()
+    public void UI_boot()
     {
+
         text1 = new JTextArea(1,50);
         text1.setFont(new Font("宋体", Font.PLAIN, 20));
-        text1.setText("        服务器端图形界面：  以下是相关提示信息");
+        text1.setText("           服务器端图形界面：  以下是相关提示信息");
         text1.setEditable(false);
 
-        text2 = new JTextArea(50,50);
+        text2 = new JTextArea(30,35);
         text2.setFont(new Font("宋体", Font.PLAIN, 18));
         text2.setBackground(Color.cyan);
         text2.setEditable(false);
+        text2.setText("");
+
+        scroll = new JScrollPane(text2, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         BorderLayout layout = new BorderLayout(5,5);
         setLayout(layout);
         getContentPane().add(BorderLayout.NORTH, text1);
-        getContentPane().add(BorderLayout.SOUTH, text2);
+        getContentPane().add(BorderLayout.SOUTH, scroll);
 
-        setSize(550,650);
+        setSize(650,700);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(3);
         setVisible(true);
     }
 
-    public String get_like_num()           //从数据库获取点赞数目
+    public String get_like_num(String word)           //从数据库获取点赞数目
     {
-        return "";
+        MySQL_connect sql = new MySQL_connect();
+        int num1 = sql.get_likenum(word+"\t1");
+        int num2 = sql.get_likenum(word+"\t2");
+        int num3 = sql.get_likenum(word+"\t3");
+        return num1 + "\t" + num2 + "\t" + num3;
     }
 
-    public boolean update_like_num()        //更新数据库中信息
+    public boolean update_like_num(String word_index)        //更新数据库中信息
     {
-        return true;
+        MySQL_connect sql = new MySQL_connect();
+        int current_num = sql.get_likenum(word_index);
+        int i = sql.update_like(word_index, current_num);
+        return i>0;
     }
 
-    public String get_password()        //在数据库中获取密码
+    public String get_password(String name)        //在数据库中获取密码
     {
-        return "";
+        MySQL_connect sql = new MySQL_connect();
+        return sql.get_password(name);
     }
 
-    public boolean send_like_message()     //发送点赞数相关的信息
+    public boolean sign_up(String user_pass)
     {
-        return true;
+        MySQL_connect sql = new MySQL_connect();
+        int i = sql.insert_user(user_pass);
+        return i>0;
     }
 
-    public boolean send_sign_message()
-    {
-        return true;
-    }
+    private void go() {
+        try {
+            server = new ServerSocket(5001);
+            System.out.println("Server ok!");
+            InetAddress addr = InetAddress.getLocalHost();
+            String ip = addr.getHostAddress().toString();//获得本机IP    
+            System.out.println("服务器IP:" + ip);
+            while (true) {
+                System.out.println("等待新的服务请求...");
+                text2.append("\n等待新的服务请求...");
+                text2.setCaretPosition(text2.getText().length());
+                //System.out.println(text2.getText());
+                Socket sock = server.accept();
 
-    public void receive_message()
-    {
+                count++;
+                System.out.println("接受第" + count + "个服务端口");
+                text2.append("\n接受第" + count + "个服务端口");
+                input = new ObjectInputStream(sock.getInputStream());
+                temp = (MSG) input.readObject();
+                System.out.println(temp.msg);
+                input.close();
 
+                switch (temp.msg)
+                {
+                    case SIGN_IN:
+                        String user = temp.information.split("\t")[0];
+                        String password = temp.information.split("\t")[1];
+                        String pass = get_password(user);
+
+                        String sign_in_info;
+                        if(password.equals(pass))
+                        {
+                            text2.append("用户 " + user + " 登陆成功");
+                            sign_in_info = "success";
+                        }
+                        else
+                        {
+                            text2.append("用户 " + user + " 登陆不成功");
+                            sign_in_info = "fail";
+                        }
+                        Socket socket1 = server.accept();
+                        writer = new PrintWriter(socket1.getOutputStream());
+                        writer.println(sign_in_info);
+                        writer.close();
+                        socket1.close();
+                        break;
+                    case LIKE_NUM:
+                        String word = temp.information;
+                        String like_num = get_like_num(word);
+                        Socket socket2 = server.accept();
+                        writer = new PrintWriter(socket2.getOutputStream());
+                        writer.println(like_num);
+                        writer.close();
+                        socket2.close();
+                        break;
+                    case SEARCH:
+                        word  = temp.information;
+                        String out = "";
+                        network_search search = new network_search();
+                        String out1 = search.baidu_search(word);
+                        String out2 = search.bing_search(word);
+                        String out3 = search.youdao_search(word);
+                        out = out1 + "\t" + out2 + "\t";
+                        Socket socket3 = server.accept();
+                        writer = new PrintWriter(socket3.getOutputStream());
+                        writer.println(out);
+                        writer.close();
+                        socket3.close();
+                        break;
+                    case SIGN_UP:
+                        boolean sign = sign_up(temp.information);
+                        String result;
+                        if(sign)
+                            result = "success";
+                        else
+                            result = "fail";
+
+                        Socket socket4 = server.accept();
+                        writer = new PrintWriter(socket4.getOutputStream());
+                        writer.println(result);
+                        writer.close();
+                        socket4.close();
+                        break;
+                    case UPDATE_LIKE:
+                        boolean update_sign = update_like_num(temp.information);
+                        if(update_sign)
+                            result = "success";
+                        else
+                            result = "fail";
+
+                        Socket socket5 = server.accept();
+                        writer = new PrintWriter(socket5.getOutputStream());
+                        writer.println(result);
+                        writer.close();
+                        socket5.close();
+                        break;
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
     }
 
     public static void main(String args[])
     {
-         new database_server();
+        database_server ser = new database_server();
+        ser.UI_boot();
+        ser.go();
     }
 }
