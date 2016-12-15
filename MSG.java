@@ -11,7 +11,9 @@ public class MSG implements Serializable
         LIKE_NUM,
         SEARCH,
         SIGN_UP,
-        UPDATE_LIKE
+        UPDATE_LIKE,
+        SIGN_OUT,
+        ONLINE
     } m msg;
 
     String information;
