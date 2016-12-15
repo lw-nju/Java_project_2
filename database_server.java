@@ -13,7 +13,6 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
 
 public class database_server extends JFrame{
     private JTextArea text1, text2;
-    private boolean sign;
     private ServerSocket server;
     private int count = 0;
     private MSG temp;
@@ -62,7 +61,13 @@ public class database_server extends JFrame{
     {
         MySQL_connect sql = new MySQL_connect();
         int current_num = sql.get_likenum(word_index);
-        int i = sql.update_like(word_index, current_num);
+        int i = 0;
+
+        if(current_num == 0)
+            i = sql.insert_word(word_index);
+        else
+            i = sql.update_like(word_index, current_num);
+
         return i>0;
     }
 
@@ -77,6 +82,30 @@ public class database_server extends JFrame{
         MySQL_connect sql = new MySQL_connect();
         int i = sql.insert_user(user_pass);
         return i>0;
+    }
+
+    public String sign_in_check(String user)
+    {
+        MySQL_connect sql = new MySQL_connect();
+        return sql.get_signin(user);
+    }
+
+    public boolean sign_in(String user)
+    {
+        MySQL_connect sql = new MySQL_connect();
+        return sql.update_signin(user,"false") > 0;
+    }
+
+    public boolean sign_out(String user)
+    {
+        MySQL_connect sql = new MySQL_connect();
+        return sql.update_signin(user,"true") > 0;
+    }
+
+    public String get_online()
+    {
+        MySQL_connect sql = new MySQL_connect();
+        return sql.get_online();
     }
 
     private void go() {
@@ -108,11 +137,21 @@ public class database_server extends JFrame{
                         String password = temp.information.split("\t")[1];
                         String pass = get_password(user);
 
+                        String user_sign_in = sign_in_check(user);
                         String sign_in_info;
                         if(password.equals(pass))
                         {
-                            text2.append("用户 " + user + " 登陆成功");
-                            sign_in_info = "success";
+                            if(user_sign_in.equals("true"))
+                            {
+                                sign_in(user);
+                                text2.append("用户 " + user + " 重复登陆");
+                                sign_in_info = "duplicate";
+                            }
+                            else
+                            {
+                                text2.append("用户 " + user + " 登陆成功");
+                                sign_in_info = "success";
+                            }
                         }
                         else
                         {
@@ -141,7 +180,7 @@ public class database_server extends JFrame{
                         String out1 = search.baidu_search(word);
                         String out2 = search.bing_search(word);
                         String out3 = search.youdao_search(word);
-                        out = out1 + "\t" + out2 + "\t";
+                        out = out1 + "\t" + out2 + "\t" + out3;
                         Socket socket3 = server.accept();
                         writer = new PrintWriter(socket3.getOutputStream());
                         writer.println(out);
@@ -175,6 +214,36 @@ public class database_server extends JFrame{
                         writer.close();
                         socket5.close();
                         break;
+                    case SIGN_OUT:
+                        user = temp.information;
+                        user_sign_in = sign_in_check(user);
+                        if(user_sign_in.equals("true"))
+                        {
+                            sign_out(user);
+                            text2.append("用户 " + user + " 下线");
+                            sign_in_info = "success";
+                        }
+                        else
+                        {
+                            text2.append("用户 " + user + " 下线");
+                            sign_in_info = "fail";
+                        }
+                        Socket socket6 = server.accept();
+                        writer = new PrintWriter(socket6.getOutputStream());
+                        writer.println(sign_in_info);
+                        writer.close();
+                        socket6.close();
+                        break;
+                    case ONLINE:
+                        String output = get_online();
+                        Socket socket7 = server.accept();
+                        writer = new PrintWriter(socket7.getOutputStream());
+                        writer.println(output);
+                        writer.close();
+                        socket7.close();
+                        break;
+                    default:
+                        text2.append("无法处理的消息，请检查");
                 }
             }
         }
