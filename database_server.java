@@ -22,7 +22,6 @@ public class database_server extends JFrame{
 
     public void UI_boot()
     {
-
         text1 = new JTextArea(1,50);
         text1.setFont(new Font("宋体", Font.PLAIN, 20));
         text1.setText("           服务器端图形界面：  以下是相关提示信息");
@@ -123,8 +122,8 @@ public class database_server extends JFrame{
                 Socket sock = server.accept();
 
                 count++;
-                System.out.println("接受第" + count + "个服务端口");
-                text2.append("\n接受第" + count + "个服务端口");
+                System.out.println("接受第" + count + "个服务请求");
+                text2.append("\n接受第" + count + "个服务请求");
                 input = new ObjectInputStream(sock.getInputStream());
                 temp = (MSG) input.readObject();
                 System.out.println(temp.msg);
@@ -137,19 +136,23 @@ public class database_server extends JFrame{
                         String password = temp.information.split("\t")[1];
                         String pass = get_password(user);
 
+                        System.out.println("fasfsad" + temp.information);
+                        System.out.println("dsafs "+user+"  "+password + " " +pass);
+
                         String user_sign_in = sign_in_check(user);
                         String sign_in_info;
+                        System.out.println(user_sign_in);
                         if(password.equals(pass))
                         {
                             if(user_sign_in.equals("true"))
                             {
-                                sign_in(user);
-                                text2.append("用户 " + user + " 重复登陆");
+                                text2.append("用户 " + user + " 重复登录！");
                                 sign_in_info = "duplicate";
                             }
                             else
                             {
-                                text2.append("用户 " + user + " 登陆成功");
+                                sign_in(user);
+                                text2.append("用户 " + user + " 登录成功！");
                                 sign_in_info = "success";
                             }
                         }
@@ -177,7 +180,7 @@ public class database_server extends JFrame{
                         word  = temp.information;
                         String out = "";
                         network_search search = new network_search();
-                        String out1 = search.baidu_search(word);
+                        String out1 = search.jinshan_search(word);
                         String out2 = search.bing_search(word);
                         String out3 = search.youdao_search(word);
                         out = out1 + "\t" + out2 + "\t" + out3;

@@ -38,7 +38,7 @@ public class Dictionary extends JFrame{
         output3.setText("");
 
         if(bd == true)
-            output1.setText(net.baidu_search(word));
+            output1.setText(net.jinshan_search(word));
         if(yd == true)
             output2.setText(net.youdao_search(word));
         if(bg == true)

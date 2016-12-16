@@ -184,13 +184,13 @@ public class network_search {
         return ret;
     }
 
-    String baidu_search(String word)
+    String jinshan_search(String word)
     {
         word = word.replaceAll(" ","");
         String ret = "";
         try
         {
-            String search_url = "http://dict.baidu.com/s?wd=" + word;
+            String search_url = "http://www.iciba.com/" + word;
 
             URL url = new URL(search_url);
 
@@ -201,34 +201,65 @@ public class network_search {
             while ((data = reader.readLine()) != null)
             {
                 String result = blank_del(data);
-                int index = result.indexOf("<div class=\"en-content\">");
+                int index = result.indexOf("<div class=\"base-speak\">");
 
                 if(index >= 0)
                     break;
             }
             data = reader.readLine();
+            data = reader.readLine();
+
+            String yinbiao1 = "";
+            yinbiao1 = data.replace("<span>","");
+            yinbiao1 = yinbiao1.replace("</span>","");
+            yinbiao1 = yinbiao1.replace("</span>","");
+
+            data = reader.readLine();
+            data = reader.readLine();
+            data = reader.readLine();
+            data = reader.readLine();
+
+            String yinbiao2 = "";
+            yinbiao2 = data.replace("<span>","");
+            yinbiao2 = yinbiao2.replace("</span>","");
+            yinbiao2 = yinbiao2.replace("</span>","");
+
+            String yinbiao = yinbiao1.replaceAll(" ","") + ", " + yinbiao2.replaceAll(" ","");
 
             String result = "";
-            if(data != null)
+
+            while ((data = reader.readLine()) != null)
             {
-                int index = data.indexOf("<p>");
-                if(index >= 0)
-                    data = data.substring(index + 11,data.length());
+                String res = blank_del(data);
+                int index = res.indexOf("<li class=\"clearfix\">");
 
-                //System.out.println(data);
+                if (index >= 0)
+                    break;
+            }
 
-                result = data.replace("<p>","\n");
-                result = result.replace("</strong>","");
-                result = result.replace("<strong>","");
-                result = result.replace("</p>"," ");
-                result = result.replace("<span>","");
-                result = result.replace("</span>","");
-                result = result.replace("</div>","");
-                result = result.replace("</a>"," ");
 
-                result = result.replaceAll("<a href=[a-zA-Z=?\"/= ]+>","");
+            while ((data = reader.readLine()) != null)
+            {
+                String res = blank_del(data);
+                int index = res.indexOf("</ul>");
 
-                ret = "百度词典为您提供" + word + "的释义\n" + result;
+                if (index >= 0)
+                {
+                    ret = "金山词典为您提供" + word + "的释义\n" + yinbiao + "\n" + result;
+                    return ret;
+                }
+
+                String pro = res.replace("</span>","");
+                pro = pro.replace("<span class=\"prop\">","");
+                pro = pro.replace("<span>","");
+                pro = pro.replace("</p>","");
+                pro = pro.replace("<p>","");
+                pro = pro.replace("</li>","");
+                pro = pro.replace(" ","");
+                pro = pro.replace("<li class=\"clearfix\">","");
+
+                if(pro.length()>0)
+                    result = result + pro + "\n";
             }
             reader.close();
         }

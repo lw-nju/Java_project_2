@@ -93,7 +93,6 @@ public class MySQL_connect {
         try {
             pstmt = (PreparedStatement) conn.prepareStatement(sql);
             i = pstmt.executeUpdate();
-            System.out.println("resutl: " + i);
             pstmt.close();
             conn.close();
         } catch (SQLException e) {
@@ -109,7 +108,7 @@ public class MySQL_connect {
         String index = word_index.split("\t")[1];
 
         int i = 0;
-        String sql = "update Like_num set NUM='" + (int)(current_num + 1) + "' where WORD='" + word + "'";
+        String sql = "update Like_num set NUM='" + (int)(current_num + 1) + "' where WORD='" + word + "' and NET='" + index +"'";
         PreparedStatement pstmt;
         try {
             pstmt = (PreparedStatement) conn.prepareStatement(sql);
@@ -148,8 +147,10 @@ public class MySQL_connect {
         try {
             pstmt = (PreparedStatement)conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
-            rs.next();
-            return rs.getString("SIGN_IN");
+            if(rs.next())
+                return rs.getString("SIGN_IN");
+            else
+                return "";
         } catch (SQLException e) {
             e.printStackTrace();
         }
